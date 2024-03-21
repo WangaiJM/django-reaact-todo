@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   MdCheckBoxOutlineBlank,
   MdEditNote,
@@ -5,7 +6,16 @@ import {
   MdOutlineDeleteOutline,
 } from "react-icons/md";
 /* eslint-disable react/prop-types */
-const Table = ({ todos, setTodos, isLoading }) => {
+const Table = ({ todos, setTodos, isLoading, fetchData }) => {
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/todo/${id}/`);
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return isLoading ? (
     <div className="flex justify-center m-32">
       <p>Loading...</p>
@@ -61,7 +71,9 @@ const Table = ({ todos, setTodos, isLoading }) => {
                     <MdEditNote />
                   </span>
                   <span className=" cursor-pointer text-xl">
-                    <MdOutlineDeleteOutline />
+                    <MdOutlineDeleteOutline
+                      onClick={() => handleDelete(todoItem.id)}
+                    />
                   </span>
                 </td>
               </tr>
