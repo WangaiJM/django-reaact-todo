@@ -8,7 +8,7 @@ import {
 const Table = ({ todos, setTodos, isLoading }) => {
   return isLoading ? (
     <div className="flex justify-center m-32">
-      <p>Loading</p>
+      <p>Loading...</p>
     </div>
   ) : (
     <div className="py-32 flex justify-center">
