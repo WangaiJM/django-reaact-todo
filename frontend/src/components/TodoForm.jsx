@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 /* eslint-disable react/prop-types */
-const TodoForm = ({ setTodos, fetchData }) => {
+const TodoForm = ({ fetchData }) => {
   const [newTodo, setNewTodo] = useState({
     body: "",
   });
@@ -38,7 +38,6 @@ const TodoForm = ({ setTodos, fetchData }) => {
         }}
       />
       <button className="btn btn-primary" onClick={postTodo}>
-        {" "}
         Create To Do
       </button>
     </div>

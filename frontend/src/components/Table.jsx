@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState } from "react";
 import {
   MdCheckBoxOutlineBlank,
   MdEditNote,
@@ -7,6 +8,16 @@ import {
 } from "react-icons/md";
 /* eslint-disable react/prop-types */
 const Table = ({ todos, setTodos, isLoading, fetchData }) => {
+  const [editText, setEditText] = useState({
+    body: "",
+  });
+
+  const handleChange = (e) => {
+    setEditText((prev) => ({
+      ...prev,
+      body: e.target.value,
+    }));
+  };
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://127.0.0.1:8000/api/todo/${id}/`);
@@ -14,6 +25,28 @@ const Table = ({ todos, setTodos, isLoading, fetchData }) => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleEdit = async (id, value) => {
+    try {
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/api/todo/${id}/`,
+        value
+      );
+      const newTodo = todos.map((todo) =>
+        todo.id === id ? response.data : todo
+      );
+      setTodos(newTodo);
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCheckbox = (id, value) => {
+    handleEdit(id, {
+      completed: !value,
+    });
   };
 
   return isLoading ? (
@@ -47,7 +80,12 @@ const Table = ({ todos, setTodos, isLoading, fetchData }) => {
             return (
               <tr key={index}>
                 <td className="p-3 text-sm ">
-                  <span className="cursor-pointer inline-block">
+                  <span
+                    className="cursor-pointer inline-block"
+                    onClick={() => {
+                      handleCheckbox(todoItem.id, todoItem.completed);
+                    }}
+                  >
                     {todoItem.completed ? (
                       <MdOutlineCheckBox />
                     ) : (
@@ -68,7 +106,14 @@ const Table = ({ todos, setTodos, isLoading, fetchData }) => {
                 <td className="p-3 text-sm ">{todoItem.created}</td>
                 <td className="p-3 text-sm font-medium grid grid-flow-col items-center mt-5">
                   <span className=" cursor-pointer text-xl">
-                    <MdEditNote />
+                    <button
+                      className="btn"
+                      onClick={() =>
+                        document.getElementById("my_modal_2").showModal()
+                      }
+                    >
+                      <MdEditNote onClick={() => setEditText(todoItem)} />
+                    </button>
                   </span>
                   <span className=" cursor-pointer text-xl">
                     <MdOutlineDeleteOutline
@@ -81,6 +126,30 @@ const Table = ({ todos, setTodos, isLoading, fetchData }) => {
           })}
         </tbody>
       </table>
+
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg mb-4">EDIT</h3>
+          <div className="flex">
+            <input
+              type="text"
+              placeholder="Add Todo"
+              className="input mr-4 flex-1"
+              onChange={handleChange}
+              value={editText.body}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={() => handleEdit(editText.id, editText)}
+            >
+              Edit To Do
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
   );
 };
